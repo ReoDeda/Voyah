@@ -35,7 +35,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"
-                android:src="@drawable/logovoyh" />
+                android:src="@drawable/ic_logo_voyah" />
         </FrameLayout>
 
         <!-- Home Button -->
@@ -52,7 +52,7 @@
                 android:layout_gravity="center"
                 android:alpha="0.9"
                 android:scaleType="centerInside"
-                android:src="@drawable/home" />
+                android:src="@drawable/ic_home" />
         </FrameLayout>
 
         <!-- Nav Button -->
@@ -69,7 +69,7 @@
                 android:layout_gravity="center"
                 android:alpha="0.9"
                 android:scaleType="centerInside"
-                android:src="@drawable/navigator" />
+                android:src="@drawable/ic_navigation" />
         </FrameLayout>
 
         <!-- Music Button -->
@@ -86,7 +86,7 @@
                 android:layout_gravity="center"
                 android:alpha="0.9"
                 android:scaleType="centerInside"
-                android:src="@drawable/muzik" />
+                android:src="@drawable/ic_music" />
         </FrameLayout>
 
         <!-- Phone Button -->
@@ -103,7 +103,7 @@
                 android:layout_gravity="center"
                 android:alpha="0.9"
                 android:scaleType="centerInside"
-                android:src="@drawable/phone" />
+                android:src="@drawable/ic_phone" />
         </FrameLayout>
 
         <!-- Settings Button -->
@@ -119,7 +119,7 @@
                 android:layout_gravity="center"
                 android:alpha="0.9"
                 android:scaleType="centerInside"
-                android:src="@drawable/setting" />
+                android:src="@drawable/ic_settings" />
         </FrameLayout>
 
     </LinearLayout>
