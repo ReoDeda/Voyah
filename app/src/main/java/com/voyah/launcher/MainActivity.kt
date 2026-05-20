@@ -228,6 +228,7 @@ class MainActivity : AppCompatActivity() {
 
         loadAppIcons()
         setupAppButtons()
+        setupSidebarMenu()
         setupEmergencyControls()
         checkOverlayPermission()
 
@@ -386,6 +387,65 @@ class MainActivity : AppCompatActivity() {
                 binding.btnMusicPlayPause.setImageResource(android.R.drawable.ic_media_pause)
             } else {
                 binding.btnMusicPlayPause.setImageResource(android.R.drawable.ic_media_play)
+            }
+        }
+    }
+
+    private fun setupSidebarMenu() {
+        // 1. Машина - информация об устройстве
+        binding.btnMainCar.setOnClickListener {
+            try {
+                val intent = Intent(Settings.ACTION_DEVICE_INFO_SETTINGS)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Информация об устройстве", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 2. Домик - главный экран (просто остаемся здесь)
+        binding.btnMainHome.setOnClickListener {
+            // Уже на главном экране
+            hideSystemUI()
+        }
+
+        // 3. Стрелка - навигация
+        binding.btnMainNav.setOnClickListener {
+            val pkg = resolveInstalledPackage(
+                candidates = listOf("ru.yandex.yandexnavi"),
+                labelKeywords = listOf("yandex navigator", "яндекс навигатор")
+            )
+            if (pkg != null) launchApp(pkg) else Toast.makeText(this, "Установите Яндекс.Навигатор", Toast.LENGTH_LONG).show()
+        }
+
+        // 4. Нота - музыка
+        binding.btnMainMusic.setOnClickListener {
+            val pkg = resolveInstalledPackage(
+                candidates = listOf("ru.yandex.music"),
+                labelKeywords = listOf("yandex music", "яндекс музыка")
+            )
+            if (pkg != null) launchApp(pkg) else Toast.makeText(this, "Установите Яндекс.Музыку", Toast.LENGTH_LONG).show()
+        }
+
+        // 5. Телефон - звонки
+        binding.btnMainPhone.setOnClickListener {
+            try {
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Телефон недоступен", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 6. Квадратики - все приложения / настройки
+        binding.btnMainSettings.setOnClickListener {
+            try {
+                val intent = Intent(Settings.ACTION_SETTINGS)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Настройки недоступны", Toast.LENGTH_SHORT).show()
             }
         }
     }
