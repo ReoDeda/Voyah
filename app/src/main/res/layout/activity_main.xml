@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/voyah_dark_bg"
+    tools:context=".MainActivity">
+
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/main_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/main_bg" />
+
+    <!-- Left Padding to compensate for Overlay Sidebar (увеличен до 120dp) -->
+    <View
+        android:id="@+id/sidebar_spacer"
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Top Bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_bar"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sidebar_spacer"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/top_weather_icon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@android:drawable/star_on"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/top_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="16°C"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="12dp"
+                android:src="@android:drawable/stat_sys_speakerphone"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="12dp"
+                android:src="@android:drawable/ic_menu_sort_by_size"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@android:drawable/ic_lock_silent_mode_off"
+                app:tint="@color/white" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- WORKSPACE: Contains Native Draggable Widgets -->
+    <RelativeLayout
+        android:id="@+id/workspace"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@id/sidebar_spacer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintBottom_toTopOf="@id/bottom_bar">
+
+        <!-- Native Weather Widget -->
+        <FrameLayout
+            android:id="@+id/native_weather_widget"
+            android:layout_width="340dp"
+            android:layout_height="180dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+                
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                        
+                    <TextView
+                        android:id="@+id/tv_weather_temp_large"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--°C"
+                        android:textColor="@color/white"
+                        android:textSize="48sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+                    
+                <TextView
+                    android:id="@+id/tv_weather_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Загрузка данных..."
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_weather_wind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ветер: --"
+                    android:textColor="#80FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Native Clock Widget -->
+        <FrameLayout
+            android:id="@+id/native_clock_widget"
+            android:layout_width="340dp"
+            android:layout_height="180dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="80dp"
+            android:layout_marginTop="24dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+                
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format24Hour="HH:mm"
+                    android:format12Hour="hh:mm"
+                    android:textColor="@color/white"
+                    android:textSize="72sp"
+                    android:textStyle="bold"
+                    android:shadowColor="#80000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="4" />
+                    
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format24Hour="EEEE, dd MMMM"
+                    android:format12Hour="EEEE, dd MMMM"
+                    android:textColor="#00E5FF"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Native Music Widget -->
+        <FrameLayout
+            android:id="@+id/native_music_widget"
+            android:layout_width="500dp"
+            android:layout_height="100dp"
+            android:layout_below="@id/native_weather_widget"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/glass_card_bg"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+                
+                <!-- Album Art / Icon -->
+                <ImageView
+                    android:id="@+id/music_album_art"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@android:drawable/ic_media_play"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/app_icon_glow"
+                    android:clipToOutline="true" />
+                    
+                <!-- Track Info -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp">
+                    
+                    <TextView
+                        android:id="@+id/music_track_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Нет музыки"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="marquee" />
+                        
+                    <TextView
+                        android:id="@+id/music_track_artist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Исполнитель"
+                        android:textColor="#80FFFFFF"
+                        android:textSize="14sp"
+                        android:singleLine="true"
+                        android:ellipsize="marquee" />
+                </LinearLayout>
+                
+                <!-- Controls -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <ImageButton
+                        android:id="@+id/btn_music_prev"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@android:drawable/ic_media_previous"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/white" />
+                        
+                    <ImageButton
+                        android:id="@+id/btn_music_play_pause"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@android:drawable/ic_media_play"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/white" />
+                        
+                    <ImageButton
+                        android:id="@+id/btn_music_next"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@android:drawable/ic_media_next"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/white" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+    </RelativeLayout>
+
+
+    <!-- Bottom Quick Launch (Exact match to reference photo) -->
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sidebar_spacer">
+
+        <!-- Yandex Navigator -->
+        <LinearLayout
+            android:id="@+id/btn_yandex_nav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp">
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="115dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/app_icon_frame"
+                    android:scaleType="fitXY" />
+                <ImageView
+                    android:id="@+id/img_nav_native"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_dialog_map" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Yandex Weather -->
+        <LinearLayout
+            android:id="@+id/btn_weather_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp">
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="115dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/app_icon_frame"
+                    android:scaleType="fitXY" />
+                <ImageView
+                    android:id="@+id/img_weather_native"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_compass" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Yandex Music -->
+        <LinearLayout
+            android:id="@+id/btn_yandex_music"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp">
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="115dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/app_icon_frame"
+                    android:scaleType="fitXY" />
+                <ImageView
+                    android:id="@+id/img_music_native"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_media_play" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Alisa -->
+        <LinearLayout
+            android:id="@+id/btn_alisa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp">
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="115dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/app_icon_frame"
+                    android:scaleType="fitXY" />
+                <ImageView
+                    android:id="@+id/img_alisa_native"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_btn_speak_now" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Ivi -->
+        <LinearLayout
+            android:id="@+id/btn_ivi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp">
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="115dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/app_icon_frame"
+                    android:scaleType="fitXY" />
+                <ImageView
+                    android:id="@+id/img_ivi_native"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_slideshow" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <!-- Driving Mode Widget (Matches height and style) -->
+        <LinearLayout
+            android:id="@+id/btn_trip_mode"
+            android:layout_width="180dp"
+            android:layout_height="105dp"
+            android:background="@drawable/glass_card_bg"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:orientation="horizontal">
+            
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="РЕЖИМ ДВИЖЕНИЯ" android:textColor="#80FFFFFF" android:textSize="9sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Comfort" android:textColor="@color/white" android:textSize="18sp" android:textStyle="bold" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/mashina"
+                android:alpha="0.6"
+                app:tint="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Emergency Controls (Top Right) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        
+        <ImageButton
+            android:id="@+id/btn_minimize"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/glass_card_bg"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="@color/white"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
+            android:id="@+id/btn_exit"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/glass_card_bg"
+            android:src="@android:drawable/ic_lock_power_off"
+            app:tint="@color/white"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
+            android:id="@+id/btn_installer"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/glass_card_bg"
+            android:src="@android:drawable/ic_menu_add"
+            app:tint="#00E5FF" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="140dp"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <!-- Отступ слева от края экрана -->
+    <View
+        android:layout_width="16dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
+    <!-- Островная панель -->
+    <LinearLayout
+        android:layout_width="96dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/sidebar_bg_island"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp">
+
+        <!-- Логотип Voyah -->
+        <ImageView
+            android:id="@+id/logo_voyah"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/logovoyh"
+            android:scaleType="centerInside" />
+
+        <!-- Активная кнопка (Машина) -->
+        <FrameLayout
+            android:id="@+id/btn_car_sidebar"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="8dp">
+
+            <!-- Синий индикатор сбоку (в точности как на вашей картинке) -->
+            <View
+                android:layout_width="4dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical|start"
+                android:background="#00E5FF" />
+
+            <!-- Подложка активной кнопки -->
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_gravity="center"
+                android:background="@drawable/sidebar_active_btn">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/mashina"
+                    android:scaleType="centerInside" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <!-- Дом -->
+        <ImageView
+            android:id="@+id/btn_home_sidebar"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:padding="16dp"
+            android:src="@drawable/home"
+            android:scaleType="centerInside"
+            android:alpha="0.7" />
+
+        <!-- Навигатор -->
+        <ImageView
+            android:id="@+id/btn_nav_sidebar"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:padding="16dp"
+            android:src="@drawable/navigator"
+            android:scaleType="centerInside"
+            android:alpha="0.7" />
+
+        <!-- Музыка -->
+        <ImageView
+            android:id="@+id/btn_music_sidebar"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:padding="16dp"
+            android:src="@drawable/muzik"
+            android:scaleType="centerInside"
+            android:alpha="0.7" />
+
+        <!-- Телефон -->
+        <ImageView
+            android:id="@+id/btn_phone_sidebar"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:padding="16dp"
+            android:src="@drawable/phone"
+            android:scaleType="centerInside"
+            android:alpha="0.7" />
+
+        <!-- Настройки -->
+        <ImageView
+            android:id="@+id/btn_settings_sidebar"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:padding="16dp"
+            android:src="@drawable/setting"
+            android:scaleType="centerInside"
+            android:alpha="0.7" />
+
+    </LinearLayout>
+
+    <!-- Зона для свайпа (невидимая) -->
+    <FrameLayout
+        android:id="@+id/touch_area"
+        android:layout_width="28dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+        
+        <View
+            android:id="@+id/sidebar_handle"
+            android:layout_width="8dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_vertical|start"
+            android:background="@drawable/sidebar_handle_bg"
+            android:alpha="0.7" />
+    </FrameLayout>
+
+</LinearLayout>

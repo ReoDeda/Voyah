@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Voyah Passion Launcher</string>
+    <string name="settings">Настройки</string>
+    <string name="apps">Приложения</string>
+    <string name="weather_loading">Загрузка погоды...</string>
+    <string name="yandex_nav">Яндекс Навигатор</string>
+    <string name="yandex_music">Яндекс Музыка</string>
+    <string name="youtube">YouTube</string>
+    <string name="install_apps">Установить софт</string>
+    <string name="exit_launcher">Выйти в систему</string>
+    <string name="uninstall_launcher">Удалить лаунчер</string>
+    <string name="minimize">Свернуть</string>
+    <string name="confirm_uninstall">Вы уверены, что хотите удалить лаунчер?</string>
+</resources>

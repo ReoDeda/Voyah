@@ -1,0 +1,8 @@
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="voyah_gold">#D4AF37</color>
+    <color name="voyah_dark_bg">#1A1A1A</color>
+    <color name="voyah_accent">#00BCD4</color>
+    <color name="glass_bg">#CC000000</color>
+</resources>
