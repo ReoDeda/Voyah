@@ -1,8 +1,41 @@
 <resources>
+    <!-- Base Colors -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Modern Premium Palette -->
     <color name="voyah_gold">#D4AF37</color>
-    <color name="voyah_dark_bg">#1A1A1A</color>
-    <color name="voyah_accent">#00BCD4</color>
-    <color name="glass_bg">#CC000000</color>
+    <color name="voyah_gold_light">#FFD700</color>
+    
+    <!-- Dark Theme -->
+    <color name="dark_bg_primary">#0A0A0A</color>
+    <color name="dark_bg_secondary">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+    
+    <!-- Glassmorphism -->
+    <color name="glass_dark">#1A1A1A1A</color>
+    <color name="glass_darker">#33000000</color>
+    <color name="glass_light">#0DFFFFFF</color>
+    <color name="glass_border">#26FFFFFF</color>
+    
+    <!-- Accent Colors -->
+    <color name="accent_cyan">#00E5FF</color>
+    <color name="accent_blue">#2196F3</color>
+    <color name="accent_purple">#9C27B0</color>
+    <color name="accent_gold">#FFB300</color>
+    
+    <!-- Status Colors -->
+    <color name="active_glow">#00E5FF</color>
+    <color name="inactive_grey">#666666</color>
+    <color name="hover_white">#33FFFFFF</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3FFFFFF</color>
+    <color name="text_tertiary">#80FFFFFF</color>
+    
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#1A1A2E</color>
+    <color name="gradient_mid">#16213E</color>
+    <color name="gradient_end">#0F3460</color>
 </resources>
