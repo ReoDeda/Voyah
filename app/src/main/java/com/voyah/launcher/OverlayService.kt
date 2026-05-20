@@ -42,7 +42,7 @@ class OverlayService : Service() {
         }
 
         params = WindowManager.LayoutParams(
-            (130 * resources.displayMetrics.density).toInt(),
+            (120 * resources.displayMetrics.density).toInt(),
             WindowManager.LayoutParams.MATCH_PARENT,
             layoutType,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
@@ -127,7 +127,7 @@ class OverlayService : Service() {
         if (isHidden) return
         isHidden = true
         binding.sidebarHandle.visibility = View.VISIBLE
-        val targetX = -(108 * resources.displayMetrics.density).toInt()
+        val targetX = -(100 * resources.displayMetrics.density).toInt()
         animateSidebar(targetX)
     }
 
@@ -147,52 +147,43 @@ class OverlayService : Service() {
         hideHandler.postDelayed(autoHideRunnable, 10000)
     }
 
-    private fun setActiveButton(button: View) {
-        // Сброс всех кнопок
-        binding.btnHomeSidebar.setBackgroundResource(R.drawable.sidebar_button_frame)
-        binding.btnNavSidebar.setBackgroundResource(R.drawable.sidebar_button_frame)
-        binding.btnMusicSidebar.setBackgroundResource(R.drawable.sidebar_button_frame)
-        binding.btnPhoneSidebar.setBackgroundResource(R.drawable.sidebar_button_frame)
-        binding.btnSettingsSidebar.setBackgroundResource(R.drawable.sidebar_button_frame)
-        
-        // Активация выбранной кнопки
-        button.setBackgroundResource(R.drawable.sidebar_button_active)
-    }
-
     private fun setupSidebarActions() {
+        // 1. Машина - раздел автомобиля
+        binding.btnCarSidebar.setOnClickListener {
+            val intent = Intent(android.provider.Settings.ACTION_DEVICE_INFO_SETTINGS)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            resetHideTimer()
+        }
+
+        // 2. Домик - главный экран
         binding.btnHomeSidebar.setOnClickListener {
-            setActiveButton(it)
             launchMainActivity()
             showSidebar()
         }
-        
-        binding.logoContainer.setOnClickListener {
-            launchMainActivity()
-            showSidebar()
-        }
-        
+
+        // 3. Стрелка - навигация
         binding.btnNavSidebar.setOnClickListener {
-            setActiveButton(it)
             launchApp("ru.yandex.yandexnavi")
             hideSidebar()
         }
-        
+
+        // 4. Нота - музыка
         binding.btnMusicSidebar.setOnClickListener {
-            setActiveButton(it)
             launchApp("ru.yandex.music")
             hideSidebar()
         }
-        
+
+        // 5. Телефон - звонки
         binding.btnPhoneSidebar.setOnClickListener {
-            setActiveButton(it)
             val intent = Intent(Intent.ACTION_DIAL)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
             hideSidebar()
         }
-        
+
+        // 6. Квадратики - все приложения / настройки
         binding.btnSettingsSidebar.setOnClickListener {
-            setActiveButton(it)
             val intent = Intent(android.provider.Settings.ACTION_SETTINGS)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
