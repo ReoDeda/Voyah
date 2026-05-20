@@ -238,16 +238,15 @@ class MainActivity : AppCompatActivity() {
         refreshWeather()
         setupMediaWidget()
 
-        // Вызываем появление сайдбара при запуске
-        val intent = Intent(this, OverlayService::class.java)
-        intent.action = "SHOW_SIDEBAR"
-        startService(intent)
-        
-        // По тапу на пустом месте главного экрана тоже вызываем сайдбар
-        binding.root.setOnClickListener {
-            val showIntent = Intent(this, OverlayService::class.java)
-            showIntent.action = "SHOW_SIDEBAR"
-            startService(showIntent)
+        // Запускаем sidebar только если разрешение оверлея есть
+        try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
+                val intent = Intent(this, OverlayService::class.java)
+                intent.action = "SHOW_SIDEBAR"
+                startService(intent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

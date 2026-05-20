@@ -94,19 +94,6 @@
 
     </FrameLayout>
 
-    <!-- Невидимый logo для совместимости с кодом -->
-    <View
-        android:id="@+id/logo_voyah"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone" />
-
-    <View
-        android:id="@+id/logo_container"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone" />
-
     <!-- Touch Area for Swipe Gestures -->
     <FrameLayout
         android:id="@+id/touch_area"

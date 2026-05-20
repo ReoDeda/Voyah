@@ -26,46 +26,53 @@ class OverlayService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        
-        binding = OverlaySidebarBinding.inflate(inflater)
-        sidebarView = binding.root
-        
-        setupSidebarActions()
-        setupTouchListener()
+        try {
+            windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            
+            binding = OverlaySidebarBinding.inflate(inflater)
+            sidebarView = binding.root
+            
+            setupSidebarActions()
+            setupTouchListener()
 
-        val layoutType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            WindowManager.LayoutParams.TYPE_PHONE
+            val layoutType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            } else {
+                WindowManager.LayoutParams.TYPE_PHONE
+            }
+
+            params = WindowManager.LayoutParams(
+                (120 * resources.displayMetrics.density).toInt(),
+                WindowManager.LayoutParams.MATCH_PARENT,
+                layoutType,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                PixelFormat.TRANSLUCENT
+            )
+
+            params.gravity = Gravity.TOP or Gravity.START
+            params.x = 0
+            params.y = 0
+
+            windowManager.addView(sidebarView, params)
+            resetHideTimer()
+            
+            sidebarView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Если не удалось создать оверлей (например, нет разрешения) - 
+            // просто останавливаем сервис, не крашим лаунчер
+            stopSelf()
         }
-
-        params = WindowManager.LayoutParams(
-            (120 * resources.displayMetrics.density).toInt(),
-            WindowManager.LayoutParams.MATCH_PARENT,
-            layoutType,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            PixelFormat.TRANSLUCENT
-        )
-
-        params.gravity = Gravity.TOP or Gravity.START
-        params.x = 0
-        params.y = 0
-
-        windowManager.addView(sidebarView, params)
-        resetHideTimer()
-        
-        sidebarView.systemUiVisibility = (
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        )
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -116,7 +123,7 @@ class OverlayService : Service() {
     }
 
     private fun showSidebar() {
-        if (!isHidden) return
+        if (!::binding.isInitialized || !isHidden) return
         isHidden = false
         binding.sidebarHandle.visibility = View.GONE
         animateSidebar(0)
@@ -124,7 +131,7 @@ class OverlayService : Service() {
     }
 
     private fun hideSidebar() {
-        if (isHidden) return
+        if (!::binding.isInitialized || isHidden) return
         isHidden = true
         binding.sidebarHandle.visibility = View.VISIBLE
         val targetX = -(100 * resources.displayMetrics.density).toInt()
@@ -132,14 +139,23 @@ class OverlayService : Service() {
     }
 
     private fun animateSidebar(targetX: Int) {
-        val startX = params.x
-        val animator = android.animation.ValueAnimator.ofInt(startX, targetX)
-        animator.addUpdateListener { animation ->
-            params.x = animation.animatedValue as Int
-            windowManager.updateViewLayout(sidebarView, params)
+        if (!::sidebarView.isInitialized || !::params.isInitialized) return
+        try {
+            val startX = params.x
+            val animator = android.animation.ValueAnimator.ofInt(startX, targetX)
+            animator.addUpdateListener { animation ->
+                params.x = animation.animatedValue as Int
+                try {
+                    windowManager.updateViewLayout(sidebarView, params)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            animator.duration = 250
+            animator.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        animator.duration = 250
-        animator.start()
     }
 
     private fun resetHideTimer() {
@@ -225,8 +241,12 @@ class OverlayService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         hideHandler.removeCallbacks(autoHideRunnable)
-        if (::sidebarView.isInitialized) {
-            windowManager.removeView(sidebarView)
+        try {
+            if (::sidebarView.isInitialized && sidebarView.isAttachedToWindow) {
+                windowManager.removeView(sidebarView)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
