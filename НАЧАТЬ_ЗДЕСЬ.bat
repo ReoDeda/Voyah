@@ -56,13 +56,13 @@ echo ╔════════════════════════
 echo ║              ⚡ БЫСТРОЕ ОБНОВЛЕНИЕ (СКАЧИВАНИЕ)                ║
 echo ╚════════════════════════════════════════════════════════════════╝
 echo.
-call quick_update.bat
+call "1_СКАЧАТЬ_ОБНОВЛЕНИЯ.bat"
 pause
 goto MAIN_MENU
 
 :FULL_UPDATE
 cls
-call update_project.bat
+call "3_ПОЛНОЕ_МЕНЮ_ОБНОВЛЕНИЙ.bat"
 goto MAIN_MENU
 
 :QUICK_PUSH
@@ -72,13 +72,13 @@ echo ╔════════════════════════
 echo ║              ⚡ БЫСТРАЯ ОТПРАВКА (ЗАГРУЗКА)                    ║
 echo ╚════════════════════════════════════════════════════════════════╝
 echo.
-call quick_push.bat
+call "2_ОТПРАВИТЬ_НА_СЕРВЕР.bat"
 pause
 goto MAIN_MENU
 
 :FULL_PUSH
 cls
-call push_to_github.bat
+call "4_ПОЛНОЕ_МЕНЮ_ОТПРАВКИ.bat"
 goto MAIN_MENU
 
 :SHOW_STATUS
