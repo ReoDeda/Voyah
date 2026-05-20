@@ -16,6 +16,7 @@ class OverlayService : Service() {
     private lateinit var sidebarView: View
     private lateinit var binding: OverlaySidebarBinding
     private lateinit var params: WindowManager.LayoutParams
+    private lateinit var settingsManager: SettingsManager
     private var isHidden = false
     private val hideHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private val autoHideRunnable = Runnable { hideSidebar() }
@@ -27,6 +28,7 @@ class OverlayService : Service() {
         super.onCreate()
 
         try {
+            settingsManager = SettingsManager(this)
             windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
             val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             
@@ -42,8 +44,14 @@ class OverlayService : Service() {
                 WindowManager.LayoutParams.TYPE_PHONE
             }
 
+            // Используем настройки пользователя
+            val widthDp = settingsManager.sidebarWidth
+            val offsetXDp = settingsManager.sidebarOffsetX
+            val offsetYDp = settingsManager.sidebarOffsetY
+            val density = resources.displayMetrics.density
+
             params = WindowManager.LayoutParams(
-                (120 * resources.displayMetrics.density).toInt(),
+                (widthDp * density).toInt(),
                 WindowManager.LayoutParams.MATCH_PARENT,
                 layoutType,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
@@ -53,11 +61,15 @@ class OverlayService : Service() {
             )
 
             params.gravity = Gravity.TOP or Gravity.START
-            params.x = 0
-            params.y = 0
+            params.x = (offsetXDp * density).toInt()
+            params.y = (offsetYDp * density).toInt()
 
             windowManager.addView(sidebarView, params)
-            resetHideTimer()
+
+            // Запускаем таймер автоскрытия только если нужно
+            if (settingsManager.sidebarAutoHide && !settingsManager.sidebarNeverHide) {
+                resetHideTimer()
+            }
             
             sidebarView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -126,15 +138,23 @@ class OverlayService : Service() {
         if (!::binding.isInitialized || !isHidden) return
         isHidden = false
         binding.sidebarHandle.visibility = View.GONE
-        animateSidebar(0)
+        // Возвращаемся к настроенной X позиции
+        val targetX = if (::settingsManager.isInitialized) {
+            (settingsManager.sidebarOffsetX * resources.displayMetrics.density).toInt()
+        } else 0
+        animateSidebar(targetX)
         resetHideTimer()
     }
 
     private fun hideSidebar() {
         if (!::binding.isInitialized || isHidden) return
+        // Если "никогда не скрывать" - не скрываем
+        if (::settingsManager.isInitialized && settingsManager.sidebarNeverHide) return
         isHidden = true
         binding.sidebarHandle.visibility = View.VISIBLE
-        val targetX = -(100 * resources.displayMetrics.density).toInt()
+        // Сдвигаем меню за пределы экрана с учётом настроенной ширины
+        val widthDp = if (::settingsManager.isInitialized) settingsManager.sidebarWidth else 120
+        val targetX = -((widthDp - 20) * resources.displayMetrics.density).toInt()
         animateSidebar(targetX)
     }
 
@@ -160,7 +180,12 @@ class OverlayService : Service() {
 
     private fun resetHideTimer() {
         hideHandler.removeCallbacks(autoHideRunnable)
-        hideHandler.postDelayed(autoHideRunnable, 10000)
+        // Если "никогда не скрывать" - не запускаем таймер
+        if (::settingsManager.isInitialized && settingsManager.sidebarNeverHide) return
+        if (::settingsManager.isInitialized && !settingsManager.sidebarAutoHide) return
+        // Используем настроенное время задержки
+        val delaySec = if (::settingsManager.isInitialized) settingsManager.sidebarHideDelay else 10
+        hideHandler.postDelayed(autoHideRunnable, delaySec * 1000L)
     }
 
     private fun setupSidebarActions() {

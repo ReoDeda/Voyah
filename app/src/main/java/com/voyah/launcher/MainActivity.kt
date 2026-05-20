@@ -37,6 +37,7 @@ import android.content.IntentFilter
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var settingsManager: SettingsManager
     private var isTripModeActive = false
 
     private val alisaPackageCandidates = listOf(
@@ -226,6 +227,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        settingsManager = SettingsManager(this)
+
+        applySidebarSettings()
         loadAppIcons()
         setupAppButtons()
         setupSidebarMenu()
@@ -466,6 +470,173 @@ class MainActivity : AppCompatActivity() {
         binding.btnInstaller.setOnClickListener {
             startActivity(Intent(this, InstallerActivity::class.java))
         }
+
+        // Новая 4-я кнопка - Настройки
+        binding.btnSettingsMain.setOnClickListener {
+            showSettingsDialog()
+        }
+    }
+
+    /**
+     * Применяет сохранённые настройки sidebar к layout.
+     */
+    private fun applySidebarSettings() {
+        val density = resources.displayMetrics.density
+        val width = (settingsManager.sidebarWidth * density).toInt()
+        val offsetX = (settingsManager.sidebarOffsetX * density).toInt()
+        val offsetY = (settingsManager.sidebarOffsetY * density).toInt()
+
+        // Меняем ширину sidebar_spacer
+        val params = binding.sidebarSpacer.layoutParams
+        params.width = width
+        binding.sidebarSpacer.layoutParams = params
+
+        // Применяем сдвиг
+        binding.sidebarSpacer.translationX = offsetX.toFloat()
+        binding.sidebarSpacer.translationY = offsetY.toFloat()
+    }
+
+    /**
+     * Показывает диалог настроек с управлением sidebar.
+     */
+    private fun showSettingsDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_settings, null)
+
+        val seekbarSize = dialogView.findViewById<android.widget.SeekBar>(R.id.seekbar_sidebar_size)
+        val tvSizeValue = dialogView.findViewById<TextView>(R.id.tv_sidebar_size_value)
+        val seekbarX = dialogView.findViewById<android.widget.SeekBar>(R.id.seekbar_sidebar_x)
+        val tvXValue = dialogView.findViewById<TextView>(R.id.tv_sidebar_x_value)
+        val seekbarY = dialogView.findViewById<android.widget.SeekBar>(R.id.seekbar_sidebar_y)
+        val tvYValue = dialogView.findViewById<TextView>(R.id.tv_sidebar_y_value)
+        val checkboxAutoHide = dialogView.findViewById<android.widget.CheckBox>(R.id.checkbox_auto_hide)
+        val checkboxNeverHide = dialogView.findViewById<android.widget.CheckBox>(R.id.checkbox_never_hide)
+        val seekbarHideDelay = dialogView.findViewById<android.widget.SeekBar>(R.id.seekbar_hide_delay)
+        val tvHideDelayValue = dialogView.findViewById<TextView>(R.id.tv_hide_delay_value)
+        val layoutHideDelay = dialogView.findViewById<View>(R.id.layout_hide_delay)
+        val btnReset = dialogView.findViewById<android.widget.Button>(R.id.btn_reset_sidebar)
+
+        // Загружаем текущие значения
+        seekbarSize.progress = settingsManager.sidebarWidth
+        tvSizeValue.text = "${settingsManager.sidebarWidth} dp"
+
+        seekbarX.progress = settingsManager.sidebarOffsetX
+        tvXValue.text = "${settingsManager.sidebarOffsetX} dp"
+
+        seekbarY.progress = settingsManager.sidebarOffsetY
+        tvYValue.text = "${settingsManager.sidebarOffsetY} dp"
+
+        checkboxAutoHide.isChecked = settingsManager.sidebarAutoHide
+        checkboxNeverHide.isChecked = settingsManager.sidebarNeverHide
+
+        seekbarHideDelay.progress = settingsManager.sidebarHideDelay
+        tvHideDelayValue.text = "${settingsManager.sidebarHideDelay} сек"
+
+        updateHideDelayVisibility(checkboxAutoHide, checkboxNeverHide, seekbarHideDelay, layoutHideDelay)
+
+        // Обработчики SeekBar
+        seekbarSize.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                tvSizeValue.text = "$progress dp"
+                settingsManager.sidebarWidth = progress
+                applySidebarSettings()
+            }
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+
+        seekbarX.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                tvXValue.text = "$progress dp"
+                settingsManager.sidebarOffsetX = progress
+                applySidebarSettings()
+            }
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+
+        seekbarY.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                tvYValue.text = "$progress dp"
+                settingsManager.sidebarOffsetY = progress
+                applySidebarSettings()
+            }
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+
+        seekbarHideDelay.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                tvHideDelayValue.text = "$progress сек"
+                settingsManager.sidebarHideDelay = progress
+            }
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+
+        // Чекбоксы (взаимоисключающие)
+        checkboxAutoHide.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.sidebarAutoHide = isChecked
+            if (isChecked) {
+                checkboxNeverHide.isChecked = false
+                settingsManager.sidebarNeverHide = false
+            }
+            updateHideDelayVisibility(checkboxAutoHide, checkboxNeverHide, seekbarHideDelay, layoutHideDelay)
+        }
+
+        checkboxNeverHide.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.sidebarNeverHide = isChecked
+            if (isChecked) {
+                checkboxAutoHide.isChecked = false
+                settingsManager.sidebarAutoHide = false
+            }
+            updateHideDelayVisibility(checkboxAutoHide, checkboxNeverHide, seekbarHideDelay, layoutHideDelay)
+        }
+
+        // Кнопка сброса
+        btnReset.setOnClickListener {
+            settingsManager.resetSidebarSettings()
+            seekbarSize.progress = settingsManager.sidebarWidth
+            seekbarX.progress = settingsManager.sidebarOffsetX
+            seekbarY.progress = settingsManager.sidebarOffsetY
+            checkboxAutoHide.isChecked = settingsManager.sidebarAutoHide
+            checkboxNeverHide.isChecked = settingsManager.sidebarNeverHide
+            seekbarHideDelay.progress = settingsManager.sidebarHideDelay
+            applySidebarSettings()
+            Toast.makeText(this, "Настройки меню сброшены", Toast.LENGTH_SHORT).show()
+        }
+
+        AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Готово") { dialog, _ ->
+                dialog.dismiss()
+                hideSystemUI()
+            }
+            .setOnDismissListener {
+                hideSystemUI()
+                // Перезапускаем OverlayService с новыми настройками
+                try {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
+                        stopService(Intent(this, OverlayService::class.java))
+                        val intent = Intent(this, OverlayService::class.java)
+                        intent.action = "SHOW_SIDEBAR"
+                        startService(intent)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            .show()
+    }
+
+    private fun updateHideDelayVisibility(
+        autoHide: android.widget.CheckBox,
+        neverHide: android.widget.CheckBox,
+        delaySeekbar: android.widget.SeekBar,
+        delayLayout: View
+    ) {
+        val showDelay = autoHide.isChecked && !neverHide.isChecked
+        delayLayout.visibility = if (showDelay) View.VISIBLE else View.GONE
+        delaySeekbar.visibility = if (showDelay) View.VISIBLE else View.GONE
     }
 
     override fun onResume() {

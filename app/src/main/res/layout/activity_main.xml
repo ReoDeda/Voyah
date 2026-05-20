@@ -554,41 +554,68 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Emergency Controls (Top Right) -->
+    <!-- Control Buttons (Top Right) - Незаметные кнопки -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:elevation="20dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        
+
+        <!-- 1. Свернуть (минимизация) -->
         <ImageButton
             android:id="@+id/btn_minimize"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/glass_card_bg"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:tint="@color/white"
-            android:layout_marginEnd="8dp" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:alpha="0.7"
+            android:background="@drawable/control_button_bg"
+            android:contentDescription="Свернуть"
+            android:padding="10dp"
+            android:src="@drawable/ic_control_minimize"
+            app:tint="@color/white" />
 
+        <!-- 2. Выход / питание -->
         <ImageButton
             android:id="@+id/btn_exit"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/glass_card_bg"
-            android:src="@android:drawable/ic_lock_power_off"
-            app:tint="@color/white"
-            android:layout_marginEnd="8dp" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:alpha="0.7"
+            android:background="@drawable/control_button_bg"
+            android:contentDescription="Выход"
+            android:padding="10dp"
+            android:src="@drawable/ic_control_power"
+            app:tint="@color/white" />
 
+        <!-- 3. Приложения / установщик -->
         <ImageButton
             android:id="@+id/btn_installer"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/glass_card_bg"
-            android:src="@android:drawable/ic_menu_add"
-            app:tint="#00E5FF" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:alpha="0.7"
+            android:background="@drawable/control_button_bg"
+            android:contentDescription="Приложения"
+            android:padding="10dp"
+            android:src="@drawable/ic_control_apps"
+            app:tint="@color/white" />
+
+        <!-- 4. Настройки (НОВАЯ) -->
+        <ImageButton
+            android:id="@+id/btn_settings_main"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:alpha="0.7"
+            android:background="@drawable/control_button_bg"
+            android:contentDescription="Настройки"
+            android:padding="10dp"
+            android:src="@drawable/ic_control_settings"
+            app:tint="@color/white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
