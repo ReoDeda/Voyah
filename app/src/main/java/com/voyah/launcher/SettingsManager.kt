@@ -44,6 +44,11 @@ class SettingsManager(context: Context) {
         get() = prefs.getBoolean(KEY_SIDEBAR_NEVER_HIDE, false)
         set(value) = prefs.edit().putBoolean(KEY_SIDEBAR_NEVER_HIDE, value).apply()
 
+    /** Меню поверх других программ (требует разрешение SYSTEM_ALERT_WINDOW) */
+    var sidebarAlwaysOnTop: Boolean
+        get() = prefs.getBoolean(KEY_SIDEBAR_ALWAYS_ON_TOP, false)
+        set(value) = prefs.edit().putBoolean(KEY_SIDEBAR_ALWAYS_ON_TOP, value).apply()
+
     /** Сбросить настройки sidebar к дефолтным значениям */
     fun resetSidebarSettings() {
         prefs.edit()
@@ -53,6 +58,7 @@ class SettingsManager(context: Context) {
             .remove(KEY_SIDEBAR_AUTO_HIDE)
             .remove(KEY_SIDEBAR_HIDE_DELAY)
             .remove(KEY_SIDEBAR_NEVER_HIDE)
+            .remove(KEY_SIDEBAR_ALWAYS_ON_TOP)
             .apply()
     }
 
@@ -66,6 +72,7 @@ class SettingsManager(context: Context) {
         private const val KEY_SIDEBAR_AUTO_HIDE = "sidebar_auto_hide"
         private const val KEY_SIDEBAR_HIDE_DELAY = "sidebar_hide_delay"
         private const val KEY_SIDEBAR_NEVER_HIDE = "sidebar_never_hide"
+        private const val KEY_SIDEBAR_ALWAYS_ON_TOP = "sidebar_always_on_top"
 
         // Значения по умолчанию
         const val DEFAULT_SIDEBAR_WIDTH = 120

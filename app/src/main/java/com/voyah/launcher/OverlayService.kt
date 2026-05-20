@@ -135,7 +135,12 @@ class OverlayService : Service() {
     }
 
     private fun showSidebar() {
-        if (!::binding.isInitialized || !isHidden) return
+        if (!::binding.isInitialized) return
+        if (!isHidden) {
+            // Даже если уже видно — обновим таймер если надо
+            resetHideTimer()
+            return
+        }
         isHidden = false
         binding.sidebarHandle.visibility = View.GONE
         // Возвращаемся к настроенной X позиции
@@ -148,8 +153,17 @@ class OverlayService : Service() {
 
     private fun hideSidebar() {
         if (!::binding.isInitialized || isHidden) return
-        // Если "никогда не скрывать" - не скрываем
-        if (::settingsManager.isInitialized && settingsManager.sidebarNeverHide) return
+        // ⚠ Если "никогда не скрывать" — не скрываем
+        if (::settingsManager.isInitialized && settingsManager.sidebarNeverHide) {
+            // Убираем таймер на всякий случай
+            hideHandler.removeCallbacks(autoHideRunnable)
+            return
+        }
+        // Если автоскрытие выключено — не скрываем
+        if (::settingsManager.isInitialized && !settingsManager.sidebarAutoHide) {
+            hideHandler.removeCallbacks(autoHideRunnable)
+            return
+        }
         isHidden = true
         binding.sidebarHandle.visibility = View.VISIBLE
         // Сдвигаем меню за пределы экрана с учётом настроенной ширины
@@ -206,13 +220,13 @@ class OverlayService : Service() {
         // 3. Стрелка - навигация
         binding.btnNavSidebar.setOnClickListener {
             launchApp("ru.yandex.yandexnavi")
-            hideSidebar()
+            hideSidebarIfAllowed()
         }
 
         // 4. Нота - музыка
         binding.btnMusicSidebar.setOnClickListener {
             launchApp("ru.yandex.music")
-            hideSidebar()
+            hideSidebarIfAllowed()
         }
 
         // 5. Телефон - звонки
@@ -220,7 +234,7 @@ class OverlayService : Service() {
             val intent = Intent(Intent.ACTION_DIAL)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
-            hideSidebar()
+            hideSidebarIfAllowed()
         }
 
         // 6. Квадратики - все приложения / настройки
@@ -228,8 +242,17 @@ class OverlayService : Service() {
             val intent = Intent(android.provider.Settings.ACTION_SETTINGS)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
-            hideSidebar()
+            hideSidebarIfAllowed()
         }
+    }
+
+    /** Скрывает sidebar только если пользователь это разрешил в настройках */
+    private fun hideSidebarIfAllowed() {
+        if (::settingsManager.isInitialized) {
+            if (settingsManager.sidebarNeverHide) return
+            if (!settingsManager.sidebarAutoHide) return
+        }
+        hideSidebar()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

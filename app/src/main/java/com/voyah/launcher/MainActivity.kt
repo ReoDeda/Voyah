@@ -243,12 +243,14 @@ class MainActivity : AppCompatActivity() {
         refreshWeather()
         setupMediaWidget()
 
-        // Запускаем sidebar только если разрешение оверлея есть
+        // Запускаем sidebar только если включена опция "Поверх программ" и есть разрешение
         try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
-                val intent = Intent(this, OverlayService::class.java)
-                intent.action = "SHOW_SIDEBAR"
-                startService(intent)
+            if (settingsManager.sidebarAlwaysOnTop) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
+                    val intent = Intent(this, OverlayService::class.java)
+                    intent.action = "SHOW_SIDEBAR"
+                    startService(intent)
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -510,6 +512,7 @@ class MainActivity : AppCompatActivity() {
         val tvYValue = dialogView.findViewById<TextView>(R.id.tv_sidebar_y_value)
         val checkboxAutoHide = dialogView.findViewById<android.widget.CheckBox>(R.id.checkbox_auto_hide)
         val checkboxNeverHide = dialogView.findViewById<android.widget.CheckBox>(R.id.checkbox_never_hide)
+        val checkboxAlwaysOnTop = dialogView.findViewById<android.widget.CheckBox>(R.id.checkbox_always_on_top)
         val seekbarHideDelay = dialogView.findViewById<android.widget.SeekBar>(R.id.seekbar_hide_delay)
         val tvHideDelayValue = dialogView.findViewById<TextView>(R.id.tv_hide_delay_value)
         val layoutHideDelay = dialogView.findViewById<View>(R.id.layout_hide_delay)
@@ -527,6 +530,7 @@ class MainActivity : AppCompatActivity() {
 
         checkboxAutoHide.isChecked = settingsManager.sidebarAutoHide
         checkboxNeverHide.isChecked = settingsManager.sidebarNeverHide
+        checkboxAlwaysOnTop.isChecked = settingsManager.sidebarAlwaysOnTop
 
         seekbarHideDelay.progress = settingsManager.sidebarHideDelay
         tvHideDelayValue.text = "${settingsManager.sidebarHideDelay} сек"
@@ -592,6 +596,47 @@ class MainActivity : AppCompatActivity() {
             updateHideDelayVisibility(checkboxAutoHide, checkboxNeverHide, seekbarHideDelay, layoutHideDelay)
         }
 
+        // Чекбокс "Поверх программ" - запрашиваем разрешение или останавливаем сервис
+        checkboxAlwaysOnTop.setOnCheckedChangeListener { _, isChecked ->
+            settingsManager.sidebarAlwaysOnTop = isChecked
+            if (isChecked) {
+                // Включаем — нужно разрешение
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                    AlertDialog.Builder(this)
+                        .setTitle("Нужно разрешение")
+                        .setMessage("Для работы меню поверх других программ нужно разрешение на отображение поверх окон. Разрешить сейчас?")
+                        .setPositiveButton("Разрешить") { _, _ ->
+                            val intent = Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:$packageName")
+                            )
+                            startActivityForResult(intent, 123)
+                        }
+                        .setNegativeButton("Отмена") { _, _ ->
+                            checkboxAlwaysOnTop.isChecked = false
+                            settingsManager.sidebarAlwaysOnTop = false
+                        }
+                        .show()
+                } else {
+                    // Разрешение есть — запускаем сервис
+                    try {
+                        val intent = Intent(this, OverlayService::class.java)
+                        intent.action = "SHOW_SIDEBAR"
+                        startService(intent)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            } else {
+                // Выключаем — останавливаем сервис
+                try {
+                    stopService(Intent(this, OverlayService::class.java))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
         // Кнопка сброса
         btnReset.setOnClickListener {
             settingsManager.resetSidebarSettings()
@@ -600,6 +645,7 @@ class MainActivity : AppCompatActivity() {
             seekbarY.progress = settingsManager.sidebarOffsetY
             checkboxAutoHide.isChecked = settingsManager.sidebarAutoHide
             checkboxNeverHide.isChecked = settingsManager.sidebarNeverHide
+            checkboxAlwaysOnTop.isChecked = settingsManager.sidebarAlwaysOnTop
             seekbarHideDelay.progress = settingsManager.sidebarHideDelay
             applySidebarSettings()
             Toast.makeText(this, "Настройки меню сброшены", Toast.LENGTH_SHORT).show()
@@ -613,13 +659,15 @@ class MainActivity : AppCompatActivity() {
             }
             .setOnDismissListener {
                 hideSystemUI()
-                // Перезапускаем OverlayService с новыми настройками
+                // Перезапускаем OverlayService с новыми настройками только если включена опция "Поверх программ"
                 try {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
-                        stopService(Intent(this, OverlayService::class.java))
-                        val intent = Intent(this, OverlayService::class.java)
-                        intent.action = "SHOW_SIDEBAR"
-                        startService(intent)
+                    stopService(Intent(this, OverlayService::class.java))
+                    if (settingsManager.sidebarAlwaysOnTop) {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
+                            val intent = Intent(this, OverlayService::class.java)
+                            intent.action = "SHOW_SIDEBAR"
+                            startService(intent)
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -672,18 +720,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkOverlayPermission() {
+        // Проверяем разрешение только если пользователь включил опцию "Поверх программ"
+        if (!settingsManager.sidebarAlwaysOnTop) return
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
                 AlertDialog.Builder(this)
                     .setTitle("Настройка лаунчера")
-                    .setMessage("Для работы режима разделения экрана необходимо разрешить отображение поверх других окон.")
-                    .setCancelable(false)
+                    .setMessage("Для отображения меню поверх других программ нужно разрешение на отображение поверх окон.")
+                    .setCancelable(true)
                     .setPositiveButton("Настроить") { _, _ ->
                         val intent = Intent(
                             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:$packageName")
                         )
                         startActivityForResult(intent, 123)
+                    }
+                    .setNegativeButton("Отмена") { _, _ ->
+                        // Выключаем настройку, раз разрешения нет
+                        settingsManager.sidebarAlwaysOnTop = false
                     }
                     .show()
             } else {
@@ -697,9 +752,12 @@ class MainActivity : AppCompatActivity() {
         
         if (requestCode == 123) {
             if (Settings.canDrawOverlays(this)) {
+                settingsManager.sidebarAlwaysOnTop = true
                 startService(Intent(this, OverlayService::class.java))
+                Toast.makeText(this, "Меню теперь поверх программ", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Разрешение на отображение поверх окон не предоставлено", Toast.LENGTH_LONG).show()
+                settingsManager.sidebarAlwaysOnTop = false
+                Toast.makeText(this, "Разрешение не предоставлено", Toast.LENGTH_LONG).show()
             }
         }
     }

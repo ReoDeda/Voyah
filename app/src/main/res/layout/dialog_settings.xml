@@ -194,11 +194,31 @@
             android:id="@+id/checkbox_never_hide"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="12dp"
             android:buttonTint="#00E5FF"
             android:text="Никогда не скрывать боковое меню"
             android:textColor="@color/white"
             android:textSize="14sp" />
+
+        <!-- Чекбокс: меню поверх других программ -->
+        <CheckBox
+            android:id="@+id/checkbox_always_on_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:buttonTint="#00E5FF"
+            android:text="Меню поверх других программ"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginBottom="20dp"
+            android:text="(Меню будет видно, даже когда открыто другое приложение. Требует разрешения)"
+            android:textColor="#80FFFFFF"
+            android:textSize="12sp" />
 
         <!-- Кнопка: Сбросить настройки -->
         <Button
