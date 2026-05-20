@@ -14,7 +14,7 @@ class SettingsManager(context: Context) {
 
     // ===== Настройки бокового меню =====
 
-    /** Ширина sidebar в dp (60-200) */
+    /** Ширина sidebar в dp (60-500) */
     var sidebarWidth: Int
         get() = prefs.getInt(KEY_SIDEBAR_WIDTH, DEFAULT_SIDEBAR_WIDTH)
         set(value) = prefs.edit().putInt(KEY_SIDEBAR_WIDTH, value).apply()
